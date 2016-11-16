@@ -17,3 +17,4 @@ typedef struct Figure {
 
 
 Figure* createFigure(int x, int y, int z, int shape);
+void updatePosition(Figure* figure, double time);

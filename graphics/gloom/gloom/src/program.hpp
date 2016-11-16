@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <string>
+#include <ctime> 
+#include <chrono>
 
 
 GLuint set_vao(float* coord, GLuint* indices, float* colors, int arrayLength);

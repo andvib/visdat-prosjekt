@@ -32,3 +32,24 @@ Figure* createFigure(int x, int y, int z, int shape){
 
 	return figure;
 }
+
+void updatePosition(Figure* figure, double time){
+	float speed = 0.1;
+	
+	if((figure->X - figure->currX) > 0.05){
+		figure->currX = figure->currX + speed;
+	}else if ((figure->currX - figure->X) > 0.05){
+		figure->currX = figure->currX - speed;
+	}else{
+		figure->currX = (float) figure->X;
+	}
+
+	if((figure->Y - figure->currY) > 0.05){
+		figure->currY = figure->currY + speed;
+	}else if ((figure->currY - figure->Y) > 0.05){
+		figure->currY = figure->currY - speed;
+	}else{
+		figure->currY = (float) figure->Y;
+	}
+
+}
