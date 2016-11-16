@@ -1,2 +1,0 @@
-/home/shomeb/a/andreanv/Documents/visdat-prosjekt/graphics/gloom/build/CMakeFiles/gloom.dir
-/home/shomeb/a/andreanv/Documents/visdat-prosjekt/graphics/gloom/build/gloom/vendor/glfw/src/CMakeFiles/glfw.dir
