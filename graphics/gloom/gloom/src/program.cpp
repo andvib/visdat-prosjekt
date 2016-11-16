@@ -18,6 +18,9 @@ float forward = 1.0;
 float horizontal_rot = 0.0;
 float vertical_rot = 0.0;
 
+int ROWS = 5;
+int COLUMNS = 8;
+
 int fig_idx = 0;
 int no_of_figures = 0;
 Figure* chosen_fig;
@@ -112,7 +115,7 @@ void runProgram(GLFWwindow* window)
 
 	glm::mat4x4 trans_mat(1.0f);
 
-	GLuint board = createBoardVAO();
+	GLuint board = createBoardVAO(ROWS, COLUMNS);
 	Figure* triangle = createFigure(1, 1, 0, TRIANGLE);
 	Figure* triangle2 = createFigure(3, 2, 0, TRIANGLE);
 	Figure* triangle3 = createFigure(5, 3, 0, TRIANGLE);
@@ -209,12 +212,20 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
 			fig_idx = 0;
 		}
 	}if (key == GLFW_KEY_L && action == GLFW_PRESS){
-		chosen_fig->X += 1;
+		if(chosen_fig->X < COLUMNS-1){
+			chosen_fig->X += 1;
+		}
 	}if (key == GLFW_KEY_J && action == GLFW_PRESS){
-		chosen_fig->X -= 1;
+		if(chosen_fig->X > 0){
+			chosen_fig->X -= 1;
+		}
 	}if (key == GLFW_KEY_I && action == GLFW_PRESS){
-		chosen_fig->Y += 1;
+		if(chosen_fig->Y < ROWS-1){
+			chosen_fig->Y += 1;
+		}
 	}if (key == GLFW_KEY_K && action == GLFW_PRESS){
-		chosen_fig->Y -= 1;
+		if(chosen_fig->Y > 0){		
+			chosen_fig->Y -= 1;
+		}
 	}
 }
