@@ -22,3 +22,4 @@ typedef struct Figure {
 
 GLuint extrude(float* triangles, float* color, int num_triangles);
 Figure* createFigure(int x, int y, int z, int shape);
+void updatePosition(Figure* figure, double time);

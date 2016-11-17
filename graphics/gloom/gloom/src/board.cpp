@@ -1,11 +1,9 @@
 #include "board.hpp"
 
 
-unsigned int createBoardVAO(){
+unsigned int createBoardVAO(int rows, int columns){
 
 	const unsigned int VERTICES_PER_SQUARE = 6;
-	const unsigned int rows = 5;
-	const unsigned int columns = 8;
 	const unsigned int SQUARES = rows*columns;
 
 	float* vertices = new float[SQUARES * VERTICES_PER_SQUARE*3];

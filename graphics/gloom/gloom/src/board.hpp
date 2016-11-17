@@ -3,4 +3,4 @@
 #include <math.h>
 #include "program.hpp"
 
-unsigned int createBoardVAO();
+unsigned int createBoardVAO(int rows, int columns);
