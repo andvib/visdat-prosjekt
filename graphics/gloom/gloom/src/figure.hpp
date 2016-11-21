@@ -1,5 +1,6 @@
 #include "program.hpp"
 #include "gloom/gloom.hpp"
+#include <cmath>
 
 #define TRIANGLE 		1
 #define STAR			2
@@ -7,7 +8,9 @@
 #define	WHITE_HEX		4
 #define BLACK_HEX		5
 #define PARALLELOGRAM	6
-#define A_ISH			7
+#define V_SHAPE			7
+#define DEGREES		270
+#define PI 3.14159265
 
 typedef struct Figure {
 	// Current figure position
