@@ -18,6 +18,14 @@ float forward = 1.0;
 float horizontal_rot = 0.0;
 float vertical_rot = 0.0;
 
+int ROWS = 5;
+int COLUMNS = 8;
+
+int no_of_figures = 6;
+Figure* list_of_figures = new Figure[no_of_figures];
+int fig_idx = 0;
+Figure* chosen_fig;
+	
 
 GLuint set_vao(float* coord, GLuint* indices, float* colors, int arrayLength){
 	// Create and bind VAO
@@ -64,6 +72,24 @@ GLuint set_vao(float* coord, GLuint* indices, float* colors, int arrayLength){
 	return array;
 }
 
+static std::chrono::steady_clock::time_point _previousTimePoint = std::chrono::steady_clock::now();
+double getTimeDeltaSeconds() {
+	// Determine the current time
+	std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+	// Look up the time when the previous call to this function occurred.
+	std::chrono::steady_clock::time_point previousTime = _previousTimePoint;
+
+	// Calculate the number of nanoseconds that elapsed since the previous call to this function
+	long long timeDelta = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - _previousTimePoint).count();
+	// Convert the time delta in nanoseconds to seconds
+	double timeDeltaSeconds = (double)timeDelta / 1000000000.0;
+	
+	// Store the previously measured current time
+	_previousTimePoint = currentTime;
+	
+	// Return the calculated time delta in seconds
+	return timeDeltaSeconds;
+}
 
 
 void runProgram(GLFWwindow* window)
@@ -87,34 +113,26 @@ void runProgram(GLFWwindow* window)
 						   "/home/shomeb/a/andreanv/Documents/visdat-prosjekt/graphics/gloom/gloom/shaders/simple.frag");
 	shader.link();
 
-	/*float x = 2;
-	float triangle_coord[] = {-x, x, -15.0, -x, -x, -15.0, x, -x, -15.0,
-				  			  x, -x, -15.0, x, x, -15.0, -x, x, -15.0,
-							  x, -x, -15.0, x, x, -15.0, x, -x, -19.0,
-							  x, x, -15.0, x, -x, -19.0, x, x, -19.0,
-							  x, x, -15.0, x, x, -19.0, -x, x, -19.0,
-							  x, x, -15.0, -x, x, -19.0, -x, x, -15.0};
-
-	GLuint triangle_idx[] = {0, 1, 2, 3, 4, 5, 7, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
-	float triangle_color[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-							  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-							  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-							  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-							  0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-							  0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
-	GLuint triangle = 0;
-	triangle = set_vao(triangle_coord, triangle_idx, triangle_color, 60);*/
-
 	float i = 0.0;
 
 	glm::mat4x4 trans_mat(1.0f);
 
-	GLuint board = createBoardVAO();
+	GLuint board = createBoardVAO(ROWS, COLUMNS);
 	Figure* triangle = createFigure(1, 1, 0, TRIANGLE);
+	Figure* triangle2 = createFigure(3, 2, 0, STAR);
+	Figure* triangle3 = createFigure(5, 3, 0, WHITE_HEX);
+	Figure* triangle4 = createFigure(7, 1, 0, BLACK_HEX);
+	Figure* triangle5 = createFigure(3, 1, 0, PARALLELOGRAM);
+	Figure* triangle6 = createFigure(4, 4, 0, A_ISH);
+
+	Figure* list_of_figures[] = {triangle, triangle2, triangle3, triangle4, triangle5, triangle6};
+	double time_elapsed = 0;
 
     // Rendering Loop
     while (!glfwWindowShouldClose(window))
     {
+		chosen_fig = list_of_figures[fig_idx];
+
         // Clear colour and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -140,12 +158,18 @@ void runProgram(GLFWwindow* window)
 		glDrawElements(GL_TRIANGLES, 5*8*3*3, GL_UNSIGNED_INT, 0);
 		printGLError();
 
-		glBindVertexArray(triangle->VAO);
-		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans_mat*figure_translation));
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-		printGLError();
-
-		glBindVertexArray(0);
+		time_elapsed = getTimeDeltaSeconds();
+		Figure* curr_figure;
+		for(int j = 0; j < no_of_figures; j++){
+			curr_figure = list_of_figures[j];
+			updatePosition(curr_figure, time_elapsed);
+			glBindVertexArray(curr_figure->VAO);
+			figure_translation = glm::translate(glm::vec3(curr_figure->currX+0.5,
+												curr_figure->currY+0.5, -15.0));
+			glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans_mat*figure_translation));
+			glDrawElements(GL_TRIANGLES, curr_figure->no_vertices, GL_UNSIGNED_INT, 0);
+			printGLError();
+		}
 
 		shader.deactivate();
 
@@ -165,25 +189,46 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    } if (key == GLFW_KEY_W){// && action == GLFW_PRESS){
+    } if (key == GLFW_KEY_W){
 		forward += 0.1;
-	} if (key == GLFW_KEY_S){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_S){
 		forward -= 0.1;
-	} if (key == GLFW_KEY_A){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_A){
 		horizontal -= 1.0;
-	} if (key == GLFW_KEY_D){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_D){
 		horizontal += 1.0;
-	} if (key == GLFW_KEY_UP){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_UP){
 		vertical_rot -= 0.1;
-	} if (key == GLFW_KEY_DOWN){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_DOWN){
 		vertical_rot += 0.1;
-	} if (key == GLFW_KEY_LEFT){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_LEFT){
 		horizontal_rot -= 0.1;
-	} if (key == GLFW_KEY_RIGHT){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_RIGHT){
 		horizontal_rot += 0.1;
-	} if (key == GLFW_KEY_Q){// && action == GLFW_PRESS){
+	} if (key == GLFW_KEY_Q){
 		vertical += 1.0;
-	}if (key == GLFW_KEY_E){// && action == GLFW_PRESS){
+	}if (key == GLFW_KEY_E){
 		vertical -= 1.0;
+	}if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+		fig_idx += 1;
+		if(fig_idx >= no_of_figures){
+			fig_idx = 0;
+		}
+	}if (key == GLFW_KEY_L && action == GLFW_PRESS){
+		if(chosen_fig->X < COLUMNS-1){
+			chosen_fig->X += 1;
+		}
+	}if (key == GLFW_KEY_J && action == GLFW_PRESS){
+		if(chosen_fig->X > 0){
+			chosen_fig->X -= 1;
+		}
+	}if (key == GLFW_KEY_I && action == GLFW_PRESS){
+		if(chosen_fig->Y < ROWS-1){
+			chosen_fig->Y += 1;
+		}
+	}if (key == GLFW_KEY_K && action == GLFW_PRESS){
+		if(chosen_fig->Y > 0){		
+			chosen_fig->Y -= 1;
+		}
 	}
 }
