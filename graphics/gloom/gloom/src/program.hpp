@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <string>
-#include <ctime> 
+#include <ctime>
 #include <chrono>
 
 
@@ -21,6 +21,8 @@ void runProgram(GLFWwindow* window);
 void keyboardCallback(GLFWwindow* window, int key, int scancode,
                       int action, int mods);
 
+// Returns true if a figure is in square X, Y
+bool figure_in_square(int X, int Y);
 
 // Checks for whether an OpenGL error occurred. If one did,
 // it prints out the error type and ID

@@ -15,7 +15,7 @@ Figure* createFigure(int x, int y, int z, int shape){
 	switch(shape){
 		case TRIANGLE:{
 			float triangles[] = {-0.25, -0.25, 0.25, -0.25, 0.0, 0.25};
-			float color[] = {1.0, 1.0, 1.0, 1.0};
+			float color[] = {0.4, 0.0, 0.4, 1.0};
 
 
 			figure->VAO = extrude(triangles, color, 1);
@@ -42,8 +42,31 @@ Figure* createFigure(int x, int y, int z, int shape){
 			break;
 		}
 		case PACMAN:{
-				break;
+			const int NUM_TRIANGLES = 270;
+			float rad = (((270/NUM_TRIANGLES)*PI)/180);
+			float sum_rad = 0;
+			float radius = 0.4;
+			float last_coord[] = {0.0, radius};
+			float triangles[6*NUM_TRIANGLES];
+			for (int i = 0; i < (6*NUM_TRIANGLES); i+=6){
+				sum_rad += rad;
+				triangles[i]		= 0.0;
+				triangles[i+1]	= 0.0;
+				triangles[i+2]	= last_coord[0];
+				triangles[i+3]	= last_coord[1];
+				triangles[i+4]	= -(sin(sum_rad)*radius);
+				triangles[i+5]	= (cos(sum_rad)*radius);
+				last_coord[0] = triangles[i+4];
+				last_coord[1] = triangles[i+5];
 			}
+
+			float color[] = {1.0, 0.3, 0.3, 1.0};
+
+			figure->VAO = extrude(triangles, color, NUM_TRIANGLES);
+			figure->no_vertices = 3*3*7*NUM_TRIANGLES;
+
+			break;
+		}
 
 		case WHITE_HEX:{
 			float triangles[] = {-0.35, 0.0, -0.2, -0.3, 0.0, 0.0,
@@ -83,7 +106,7 @@ Figure* createFigure(int x, int y, int z, int shape){
 			figure->no_vertices = 3*3*7*2;
 			break;
 		}
-		case A_ISH:{
+		case V_SHAPE:{
 			float triangles[] = {-0.4, -0.4, -0.25, -0.4, 0.0, 0.4,
 								   0.0, 0.4, -0.25, -0.4, 0.0, 0.2,
 								    0.0, 0.4, 0.0, 0.2, 0.25, -0.4,
@@ -246,7 +269,7 @@ GLuint extrude(float* triangles, float* color, int num_triangles){
 
 void updatePosition(Figure* figure, double time){
 	float speed = 0.1;
-	
+
 	if((figure->X - figure->currX) > 0.05){
 		figure->currX = figure->currX + speed;
 	}else if ((figure->currX - figure->X) > 0.05){
