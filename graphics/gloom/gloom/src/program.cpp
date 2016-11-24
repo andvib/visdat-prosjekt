@@ -128,8 +128,8 @@ void runProgram(GLFWwindow* window)
 
     // Set up your scene here (create Vertex Array Objects, etc.)
 	Gloom::Shader shader;
-	shader.makeBasicShader("/home/shomec/s/simenrn/Desktop/visdat-prosjekt/graphics/gloom/gloom/shaders/simple.vert",
-						   "/home/shomec/s/simenrn/Desktop/visdat-prosjekt/graphics/gloom/gloom/shaders/simple.frag");
+	shader.makeBasicShader("../gloom/shaders/simple.vert",
+						   "../gloom/shaders/simple.frag");
 	shader.link();
 
 	glm::mat4x4 trans_mat(1.0f);
